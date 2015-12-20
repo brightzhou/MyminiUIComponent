@@ -7,10 +7,10 @@ mini.MyComponent = function () {
 
 mini.extend(mini.MyComponent, mini.TextBox,
     {
-        emptyText: "请输入税率数值",
+        emptyText: "请输入税率",
         uiCls: "mini-mycomponent",
         vtype: "float",
-        maxLength: 10,
+        maxLength: 7,
         _create: function () {
 
             var html = '<input type="' + this._InputType + '" class="mini-textbox-input" autocomplete="off"/>';
@@ -38,10 +38,9 @@ mini.extend(mini.MyComponent, mini.TextBox,
         ___OnBlur: function (e) {
             if (this.getInputText().trim() !== "") {
                 var value = this.getInputText().trim();
-                // 如果长度大于6
-                if (value.length > 6)
-                    value = value.substr(0, 6);
-                value = value + "%";
+                // 如果用户没有输入百分号自动加上
+                if(value.charAt(value.length-1)!=="%")
+                    value = value + "%";
                 this.__setValue(value);
             }
         },
@@ -63,7 +62,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
                 /**增加onpaste的支持 潘正锋 2013-10-12*/
                 mini_onOne(this._textEl, "paste", this.__OnPaste, this);
                 // 增加 propertychange 为了兼容ie8 及以下版本 该属性为ie特有
-                mini_onOne(this._textEl, "propertychange", this.__OnInput2, this);
+                mini_onOne(this._textEl, "propertychange", this.__OnInputIE, this);
                 // 增加oninput 属性 （html5 属性）
                 mini_onOne(this._textEl, "input", this.__OnInput, this);
                 var v = this.value;
@@ -73,7 +72,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
             }, this);
             //  this.on("validation", this.___OnValidation, this);
         },
-        __OnInput2:function(e){
+        __OnInputIE:function(e){
             var temp = this.getInputText().trim();
             if(temp.charAt(temp.length-1)!=="%"){
                 // 输入判断 合法返回ture
@@ -109,11 +108,10 @@ mini.extend(mini.MyComponent, mini.TextBox,
 
             this.value = value;
             this._valueEl.value = this._textEl.value = value;
-            if (this.value === "")
-                this._doEmpty();
+            this._doEmpty();
 
             /* 解决setValue不触发valuechanged事件的问题  */
-            /* when call the setValue("") method,the valid event will be trigger,cause the error icon show pzf 2014-04 */
+            /* when call the setValue("") method,the valid event will be trigger,cause the error icon show  */
             if (firechangedevent === undefined)
                 firechangedevent = true;
             if (firechangedevent)
