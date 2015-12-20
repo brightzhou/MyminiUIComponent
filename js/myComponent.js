@@ -10,6 +10,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
         emptyText: "请输入税率",
         uiCls: "mini-mycomponent",
         vtype: "float",
+        InputErrorText:"输入有误",
         maxLength: 7,
         _create: function () {
 
@@ -70,7 +71,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
                 this.value = "";
                 this.setValue(v);
             }, this);
-            //  this.on("validation", this.___OnValidation, this);
+            this.on("validation", this.___OnValidation, this);
         },
         __OnInputIE:function(e){
             var temp = this.getInputText().trim();
@@ -117,15 +118,17 @@ mini.extend(mini.MyComponent, mini.TextBox,
             if (firechangedevent)
                 this._OnValueChanged();
 
-        }
-
-     /*   ,
+        },
         ___OnValidation: function (e) {
             if (e.isValid == false)
                 return;
             var temp = e.value.substr(0, e.value.length - 1);
-            mini._ValidateVType(this.vtype, temp, e, this);
-        }*/
+            if (this.getValue().trim() !== "" && temp>100) {
+                e.isValid = false;
+                e.errorText = this.InputErrorText;
+            }
+
+        }
 
     });
 
