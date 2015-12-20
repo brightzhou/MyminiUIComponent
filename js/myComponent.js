@@ -63,7 +63,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
                 /**增加onpaste的支持 潘正锋 2013-10-12*/
                 mini_onOne(this._textEl, "paste", this.__OnPaste, this);
                 // 增加 propertychange 为了兼容ie8 及以下版本 该属性为ie特有
-                mini_onOne(this._textEl, "propertychange", this.__OnInput, this);
+                mini_onOne(this._textEl, "propertychange", this.__OnInput2, this);
                 // 增加oninput 属性 （html5 属性）
                 mini_onOne(this._textEl, "input", this.__OnInput, this);
                 var v = this.value;
@@ -72,6 +72,19 @@ mini.extend(mini.MyComponent, mini.TextBox,
                 this.setValue(v);
             }, this);
             //  this.on("validation", this.___OnValidation, this);
+        },
+        __OnInput2:function(e){
+            var temp = this.getInputText().trim();
+            if(temp.charAt(temp.length-1)!=="%"){
+                // 输入判断 合法返回ture
+                var re = /^\d*(?:\.\d{0,2})?$/.test(temp);
+                // 如果不是两位小数
+                if (!re) {
+                    var temp1 = temp.substr(0, temp.length - 1);
+                    // 不覆盖原有的setValue方法
+                    this.__setValue(temp1);
+                }
+            }
         },
         __OnInput: function (e) {
             var temp = this.getInputText().trim();
@@ -99,7 +112,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
             if (this.value === "")
                 this._doEmpty();
 
-            /* 解决setValue不触发valuechanged事件的问题 赵美丹 2012-01-17  */
+            /* 解决setValue不触发valuechanged事件的问题  */
             /* when call the setValue("") method,the valid event will be trigger,cause the error icon show pzf 2014-04 */
             if (firechangedevent === undefined)
                 firechangedevent = true;
@@ -107,6 +120,7 @@ mini.extend(mini.MyComponent, mini.TextBox,
                 this._OnValueChanged();
 
         }
+
      /*   ,
         ___OnValidation: function (e) {
             if (e.isValid == false)
